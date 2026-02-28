@@ -89,8 +89,7 @@ To build the frontend image:
 ## 📂 Project Structure
 - **/backend:** Spring Boot microservices.
 - **/frontend:** React-based web client.
-- **/files:** Interactive architecture diagrams (.jsx components).
-- **CO528 Mini Project.pdf:** Original project requirements and objective.
+- **/designs:** Interactive architecture diagrams (.jsx components).
 
 ## 🛡 Security & Roles
 - **STUDENT:** Can create posts, view/apply for jobs, and search the alumni directory.
