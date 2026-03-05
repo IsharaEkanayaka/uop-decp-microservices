@@ -1,0 +1,303 @@
+# https://taskfile.dev
+version: "3"
+
+vars:
+  JAVA_HOME: C:\Program Files\Java\jdk-17
+  MVN: mvnw.cmd
+  BACKEND_DIR: backend
+  FRONTEND_DIR: frontend/web-client
+
+dotenv: [".env"]
+
+env:
+  JAVA_HOME: "{{.JAVA_HOME}}"
+  JWT_SECRET: '{{.JWT_SECRET | default "your-very-secure-and-long-secret-key-for-decp-project"}}'
+
+tasks:
+  # ──────────────────────────────────────────
+  # Top-level commands
+  # ──────────────────────────────────────────
+
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  start:
+    desc: Start the entire DECP platform (infra + backend + frontend)
+    cmds:
+      - task: infra
+      - task: build:backend
+      - task: run:all
+
+  stop:
+    desc: Stop all running services and infrastructure
+    cmds:
+      - task: stop:infra
+
+  # ──────────────────────────────────────────
+  # Infrastructure
+  # ──────────────────────────────────────────
+
+  infra:
+    desc: Start infrastructure (PostgreSQL, MongoDB, Redis, RabbitMQ)
+    cmds:
+      - docker compose up -d
+      - echo "Waiting for infrastructure to be ready..."
+      - powershell -Command "Start-Sleep -Seconds 10"
+      - echo "Infrastructure is up."
+
+  infra:status:
+    desc: Show infrastructure container status
+    cmds:
+      - docker compose ps
+
+  stop:infra:
+    desc: Stop and remove infrastructure containers
+    cmds:
+      - docker compose down
+
+  infra:clean:
+    desc: Stop infrastructure and delete all volumes (data loss!)
+    prompt: This will DELETE all database data. Continue?
+    cmds:
+      - docker compose down -v
+
+  # ──────────────────────────────────────────
+  # Backend - Build
+  # ──────────────────────────────────────────
+
+  build:backend:
+    desc: Build all backend services (skip tests)
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - "{{.MVN}} clean package -DskipTests -T 4"
+
+  build:backend:test:
+    desc: Build all backend services with tests
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - "{{.MVN}} clean package -T 4"
+
+  test:backend:
+    desc: Run all backend tests
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - "{{.MVN}} test"
+
+  # ──────────────────────────────────────────
+  # Backend - Run individual services
+  # ──────────────────────────────────────────
+
+  run:gateway:
+    desc: Run API Gateway (port 8080)
+    dir: "{{.BACKEND_DIR}}/api-gateway"
+    cmds:
+      - java -jar target/*.jar
+
+  run:auth:
+    desc: Run Auth Service (port 8081)
+    dir: "{{.BACKEND_DIR}}/auth-service"
+    cmds:
+      - java -jar target/*.jar
+
+  run:user:
+    desc: Run User Service (port 8082)
+    dir: "{{.BACKEND_DIR}}/user-service"
+    cmds:
+      - java -jar target/*.jar
+
+  run:post:
+    desc: Run Post Service (port 8083)
+    dir: "{{.BACKEND_DIR}}/post-service"
+    cmds:
+      - java -jar target/*.jar
+
+  run:job:
+    desc: Run Job Service (port 8084)
+    dir: "{{.BACKEND_DIR}}/job-service"
+    cmds:
+      - java -jar target/*.jar
+
+  run:event:
+    desc: Run Event Service (port 8085)
+    dir: "{{.BACKEND_DIR}}/event-service"
+    cmds:
+      - java -jar target/*.jar
+
+  run:research:
+    desc: Run Research Service (port 8086)
+    dir: "{{.BACKEND_DIR}}/research-service"
+    cmds:
+      - java -jar target/*.jar
+
+  run:messaging:
+    desc: Run Messaging Service (port 8087)
+    dir: "{{.BACKEND_DIR}}/messaging-service"
+    cmds:
+      - java -jar target/*.jar
+
+  run:notification:
+    desc: Run Notification Service (port 8088)
+    dir: "{{.BACKEND_DIR}}/notification-service"
+    cmds:
+      - java -jar target/*.jar
+
+  run:analytics:
+    desc: Run Analytics Service (port 8089)
+    dir: "{{.BACKEND_DIR}}/analytics-service"
+    cmds:
+      - java -jar target/*.jar
+
+  run:mentorship:
+    desc: Run Mentorship Service (port 8090)
+    dir: "{{.BACKEND_DIR}}/mentorship-service"
+    cmds:
+      - java -jar target/*.jar
+
+  # ──────────────────────────────────────────
+  # Backend - Run ALL services in parallel
+  # ──────────────────────────────────────────
+
+  run:all:
+    desc: Run all backend services and frontend in parallel
+    deps:
+      - run:auth
+      - run:user
+      - run:post
+      - run:job
+      - run:event
+      - run:research
+      - run:messaging
+      - run:notification
+      - run:analytics
+      - run:mentorship
+      - run:gateway
+      - run:frontend
+
+  run:backend:
+    desc: Run all backend services in parallel (no frontend)
+    deps:
+      - run:auth
+      - run:user
+      - run:post
+      - run:job
+      - run:event
+      - run:research
+      - run:messaging
+      - run:notification
+      - run:analytics
+      - run:mentorship
+      - run:gateway
+
+  # ──────────────────────────────────────────
+  # Frontend
+  # ──────────────────────────────────────────
+
+  install:frontend:
+    desc: Install frontend dependencies
+    dir: "{{.FRONTEND_DIR}}"
+    cmds:
+      - npm install
+
+  run:frontend:
+    desc: Run frontend dev server (port 5173)
+    dir: "{{.FRONTEND_DIR}}"
+    cmds:
+      - npm run dev
+
+  build:frontend:
+    desc: Build frontend for production
+    dir: "{{.FRONTEND_DIR}}"
+    cmds:
+      - npm run build
+
+  test:frontend:
+    desc: Run frontend tests
+    dir: "{{.FRONTEND_DIR}}"
+    cmds:
+      - npm test
+
+  # ──────────────────────────────────────────
+  # Docker (Production)
+  # ──────────────────────────────────────────
+
+  docker:build:
+    desc: Build all Docker images for production
+    cmds:
+      - docker compose -f docker-compose.prod.yml build
+
+  docker:up:
+    desc: Start entire platform in Docker (production mode)
+    cmds:
+      - docker compose -f docker-compose.prod.yml up -d
+
+  docker:down:
+    desc: Stop all Docker production containers
+    cmds:
+      - docker compose -f docker-compose.prod.yml down
+
+  docker:logs:
+    desc: Tail logs from all production containers
+    cmds:
+      - docker compose -f docker-compose.prod.yml logs -f
+
+  # ──────────────────────────────────────────
+  # Utilities
+  # ──────────────────────────────────────────
+
+  clean:
+    desc: Clean all build artifacts
+    cmds:
+      - cmd: cd {{.BACKEND_DIR}} && {{.MVN}} clean
+      - cmd: cd {{.FRONTEND_DIR}} && if exist node_modules rmdir /s /q node_modules
+        platforms: [windows]
+      - cmd: cd {{.FRONTEND_DIR}} && rm -rf node_modules
+        platforms: [linux, darwin]
+
+  health:
+    desc: Check health of all running services
+    cmds:
+      - echo "=== API Gateway (8080) ==="
+      - cmd: curl -s http://localhost:8080/actuator/health 2>nul || echo "DOWN"
+        ignore_error: true
+      - echo ""
+      - echo "=== Auth Service (8081) ==="
+      - cmd: curl -s http://localhost:8081/actuator/health 2>nul || echo "DOWN"
+        ignore_error: true
+      - echo ""
+      - echo "=== User Service (8082) ==="
+      - cmd: curl -s http://localhost:8082/actuator/health 2>nul || echo "DOWN"
+        ignore_error: true
+      - echo ""
+      - echo "=== Post Service (8083) ==="
+      - cmd: curl -s http://localhost:8083/actuator/health 2>nul || echo "DOWN"
+        ignore_error: true
+      - echo ""
+      - echo "=== Job Service (8084) ==="
+      - cmd: curl -s http://localhost:8084/actuator/health 2>nul || echo "DOWN"
+        ignore_error: true
+      - echo ""
+      - echo "=== Event Service (8085) ==="
+      - cmd: curl -s http://localhost:8085/actuator/health 2>nul || echo "DOWN"
+        ignore_error: true
+      - echo ""
+      - echo "=== Research Service (8086) ==="
+      - cmd: curl -s http://localhost:8086/actuator/health 2>nul || echo "DOWN"
+        ignore_error: true
+      - echo ""
+      - echo "=== Messaging Service (8087) ==="
+      - cmd: curl -s http://localhost:8087/actuator/health 2>nul || echo "DOWN"
+        ignore_error: true
+      - echo ""
+      - echo "=== Notification Service (8088) ==="
+      - cmd: curl -s http://localhost:8088/actuator/health 2>nul || echo "DOWN"
+        ignore_error: true
+      - echo ""
+      - echo "=== Analytics Service (8089) ==="
+      - cmd: curl -s http://localhost:8089/actuator/health 2>nul || echo "DOWN"
+        ignore_error: true
+      - echo ""
+      - echo "=== Mentorship Service (8090) ==="
+      - cmd: curl -s http://localhost:8090/actuator/health 2>nul || echo "DOWN"
+        ignore_error: true
