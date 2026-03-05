@@ -6,7 +6,7 @@ The Department Engagement & Career Platform (DECP) is a microservices-based soci
 DECP focuses on architectural modularity and integration. It allows students to connect with alumni, share posts, apply for jobs/internships, and participate in department events.
 
 ### Core Features
-- **User Management:** Role-based access (Student, Alumni, Admin) with secure JWT authentication.
+- **User Management:** Role-based access (Student, Alumni, Admin) with secure JWT authentication .
 - **Feed & Media:** A social wall for sharing updates, images, and interacting via likes and comments.
 - **Job & Internship Portal:** Alumni can post opportunities; students can view and apply for them.
 - **Interactive Architecture:** Detailed system designs (SOA, Enterprise, Modularity) implemented as interactive React components.
