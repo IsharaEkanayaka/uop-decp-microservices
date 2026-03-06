@@ -111,6 +111,7 @@ spring:
             - Path=/api/mentorship/**
           filters:
             - Jwt
+            - RewritePath=/api/mentorship(?<segment>/?.*), /api/mentorship$\{segment}
 
 management:
   endpoints:
