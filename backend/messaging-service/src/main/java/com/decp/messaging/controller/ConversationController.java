@@ -49,7 +49,10 @@ public class ConversationController {
             @RequestHeader(value = "X-User-Id", required = false, defaultValue = "0") Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
-        return ResponseEntity.ok(messagingService.getMessages(id, userId, page, size));
+        System.out.println("Getting messages for conversation: " + id + ", userId: " + userId + ", page: " + page + ", size: " + size);
+        Page<MessageResponse> messages = messagingService.getMessages(id, userId, page, size);
+        System.out.println("Found " + messages.getTotalElements() + " total messages, returning " + messages.getContent().size() + " messages");
+        return ResponseEntity.ok(messages);
     }
 
     @PutMapping("/{id}/read")

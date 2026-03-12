@@ -110,53 +110,53 @@ public class RabbitMQConfig {
 
     // Bindings
     @Bean
-    public Binding userRegisteredBinding(Queue analyticsUserRegisteredQueue, TopicExchange userExchange) {
-        return BindingBuilder.bind(analyticsUserRegisteredQueue).to(userExchange).with("user.registered");
+    public Binding userRegisteredBinding() {
+        return BindingBuilder.bind(analyticsUserRegisteredQueue()).to(userExchange()).with("user.registered");
     }
 
     @Bean
-    public Binding postCreatedBinding(Queue analyticsPostCreatedQueue, TopicExchange postExchange) {
-        return BindingBuilder.bind(analyticsPostCreatedQueue).to(postExchange).with("post.created");
+    public Binding postCreatedBinding() {
+        return BindingBuilder.bind(analyticsPostCreatedQueue()).to(postExchange()).with("post.created");
     }
 
     @Bean
-    public Binding postLikedBinding(Queue analyticsPostLikedQueue, TopicExchange postExchange) {
-        return BindingBuilder.bind(analyticsPostLikedQueue).to(postExchange).with("post.liked");
+    public Binding postLikedBinding() {
+        return BindingBuilder.bind(analyticsPostLikedQueue()).to(postExchange()).with("post.liked");
     }
 
     @Bean
-    public Binding postCommentedBinding(Queue analyticsPostCommentedQueue, TopicExchange postExchange) {
-        return BindingBuilder.bind(analyticsPostCommentedQueue).to(postExchange).with("post.commented");
+    public Binding postCommentedBinding() {
+        return BindingBuilder.bind(analyticsPostCommentedQueue()).to(postExchange()).with("post.commented");
     }
 
     @Bean
-    public Binding jobCreatedBinding(Queue analyticsJobCreatedQueue, TopicExchange jobExchange) {
-        return BindingBuilder.bind(analyticsJobCreatedQueue).to(jobExchange).with("job.created");
+    public Binding jobCreatedBinding() {
+        return BindingBuilder.bind(analyticsJobCreatedQueue()).to(jobExchange()).with("job.created");
     }
 
     @Bean
-    public Binding jobAppliedBinding(Queue analyticsJobAppliedQueue, TopicExchange jobExchange) {
-        return BindingBuilder.bind(analyticsJobAppliedQueue).to(jobExchange).with("job.applied");
+    public Binding jobAppliedBinding() {
+        return BindingBuilder.bind(analyticsJobAppliedQueue()).to(jobExchange()).with("job.applied");
     }
 
     @Bean
-    public Binding eventCreatedBinding(Queue analyticsEventCreatedQueue, TopicExchange eventExchange) {
-        return BindingBuilder.bind(analyticsEventCreatedQueue).to(eventExchange).with("event.created");
+    public Binding eventCreatedBinding() {
+        return BindingBuilder.bind(analyticsEventCreatedQueue()).to(eventExchange()).with("event.created");
     }
 
     @Bean
-    public Binding eventRsvpBinding(Queue analyticsEventRsvpQueue, TopicExchange eventExchange) {
-        return BindingBuilder.bind(analyticsEventRsvpQueue).to(eventExchange).with("event.rsvp");
+    public Binding eventRsvpBinding() {
+        return BindingBuilder.bind(analyticsEventRsvpQueue()).to(eventExchange()).with("event.rsvp");
     }
 
     @Bean
-    public Binding researchUploadedBinding(Queue analyticsResearchUploadedQueue, TopicExchange researchExchange) {
-        return BindingBuilder.bind(analyticsResearchUploadedQueue).to(researchExchange).with("research.uploaded");
+    public Binding researchUploadedBinding() {
+        return BindingBuilder.bind(analyticsResearchUploadedQueue()).to(researchExchange()).with("research.uploaded");
     }
 
     @Bean
-    public Binding researchCitedBinding(Queue analyticsResearchCitedQueue, TopicExchange researchExchange) {
-        return BindingBuilder.bind(analyticsResearchCitedQueue).to(researchExchange).with("research.cited");
+    public Binding researchCitedBinding() {
+        return BindingBuilder.bind(analyticsResearchCitedQueue()).to(researchExchange()).with("research.cited");
     }
 
     @Bean

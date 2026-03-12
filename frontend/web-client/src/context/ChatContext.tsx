@@ -156,7 +156,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const loadConversations = useCallback(async () => {
     if (!isAuthenticated) return;
+    console.log("Loading conversations...");
     const res = await chatService.getConversations();
+    console.log("Conversations response:", res.data);
+    console.log("Number of conversations:", res.data.length);
+    res.data.forEach((conv, idx) => {
+      console.log(`Conversation ${idx}:`, { id: conv.id, participants: conv.participants, lastMessage: conv.lastMessage });
+    });
     setConversations(res.data);
   }, [isAuthenticated]);
 
@@ -176,12 +182,47 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const selectConversation = useCallback(async (conv: ConversationResponse) => {
+    console.log("=== Selecting conversation ===");
+    console.log("Conversation object:", conv);
+    console.log("Conversation ID:", conv.id);
+    console.log("Conversation ID type:", typeof conv.id);
+    
     setCurrentConversation(conv);
-    const res = await chatService.getMessages(conv.id);
-    setMessages(res.data.content?.reverse() || []);
+    setMessages([]); // Clear previous messages
+    try {
+      console.log("Calling chatService.getMessages with ID:", conv.id);
+      const res = await chatService.getMessages(conv.id);
+      console.log("Full API response:", res);
+      console.log("Response status:", res.status);
+      console.log("Response data:", res.data);
+      console.log("Response data type:", typeof res.data);
+      console.log("Response data keys:", Object.keys(res.data || {}));
+      
+      // Handle both direct array and Page object responses
+      let fetchedMessages: MessageResponse[] = [];
+      if (Array.isArray(res.data)) {
+        console.log("Response is an array");
+        fetchedMessages = res.data;
+      } else if (res.data && res.data.content && Array.isArray(res.data.content)) {
+        console.log("Response is a Page object with content array");
+        fetchedMessages = res.data.content;
+      } else {
+        console.log("Response structure is unexpected");
+      }
+      
+      console.log("Messages to display:", fetchedMessages);
+      console.log("Number of messages:", fetchedMessages.length);
+      setMessages(fetchedMessages);
 
-    // Clear unread indicator locally
-    await markConversationRead(conv.id);
+      // Clear unread indicator locally
+      await markConversationRead(conv.id);
+    } catch (err) {
+      console.error("Failed to fetch messages:", err);
+      if (err instanceof Error) {
+        console.error("Error message:", err.message);
+      }
+      setMessages([]);
+    }
   }, [markConversationRead]);
 
   const sendMessage = useCallback(

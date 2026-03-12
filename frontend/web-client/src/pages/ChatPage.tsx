@@ -130,9 +130,9 @@ export default function ChatPage() {
             {/* Chat Header */}
             <div className="border-b border-gray-200 bg-white px-6 py-4 dark:border-gray-800 dark:bg-gray-900">
               <h3 className="font-semibold text-gray-900 dark:text-white">
-                {currentConversation.participantNames
+                {(currentConversation.participantNames || [])
                   .filter(
-                    (_, i) => currentConversation.participants[i] !== user.id,
+                    (_, i) => String(currentConversation.participants?.[i]) !== String(user.id),
                   )
                   .join(", ") || "Chat"}
               </h3>
@@ -141,11 +141,11 @@ export default function ChatPage() {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="space-y-3">
-                {messages.map((msg) => (
+                {(messages || []).map((msg) => (
                   <MessageBubble
                     key={msg.id}
                     message={msg}
-                    isOwn={msg.senderId === user.id}
+                    isOwn={String(msg.senderId) === String(user.id)}
                   />
                 ))}
                 <div ref={messagesEndRef} />

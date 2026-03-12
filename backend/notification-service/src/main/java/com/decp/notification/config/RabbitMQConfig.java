@@ -92,43 +92,43 @@ public class RabbitMQConfig {
 
     // Bindings
     @Bean
-    public Binding userRegisteredBinding(Queue userRegisteredQueue, TopicExchange userExchange) {
-        return BindingBuilder.bind(userRegisteredQueue).to(userExchange).with("user.registered");
+    public Binding userRegisteredBinding() {
+        return BindingBuilder.bind(userRegisteredQueue()).to(userExchange()).with("user.registered");
     }
 
     @Bean
-    public Binding postCreatedBinding(Queue postCreatedQueue, TopicExchange postExchange) {
-        return BindingBuilder.bind(postCreatedQueue).to(postExchange).with("post.created");
+    public Binding postCreatedBinding() {
+        return BindingBuilder.bind(postCreatedQueue()).to(postExchange()).with("post.created");
     }
 
     @Bean
-    public Binding postLikedBinding(Queue postLikedQueue, TopicExchange postExchange) {
-        return BindingBuilder.bind(postLikedQueue).to(postExchange).with("post.liked");
+    public Binding postLikedBinding() {
+        return BindingBuilder.bind(postLikedQueue()).to(postExchange()).with("post.liked");
     }
 
     @Bean
-    public Binding postCommentedBinding(Queue postCommentedQueue, TopicExchange postExchange) {
-        return BindingBuilder.bind(postCommentedQueue).to(postExchange).with("post.commented");
+    public Binding postCommentedBinding() {
+        return BindingBuilder.bind(postCommentedQueue()).to(postExchange()).with("post.commented");
     }
 
     @Bean
-    public Binding jobCreatedBinding(Queue jobCreatedQueue, TopicExchange jobExchange) {
-        return BindingBuilder.bind(jobCreatedQueue).to(jobExchange).with("job.created");
+    public Binding jobCreatedBinding() {
+        return BindingBuilder.bind(jobCreatedQueue()).to(jobExchange()).with("job.created");
     }
 
     @Bean
-    public Binding jobAppliedBinding(Queue jobAppliedQueue, TopicExchange jobExchange) {
-        return BindingBuilder.bind(jobAppliedQueue).to(jobExchange).with("job.applied");
+    public Binding jobAppliedBinding() {
+        return BindingBuilder.bind(jobAppliedQueue()).to(jobExchange()).with("job.applied");
     }
 
     @Bean
-    public Binding eventCreatedBinding(Queue eventCreatedQueue, TopicExchange eventExchange) {
-        return BindingBuilder.bind(eventCreatedQueue).to(eventExchange).with("event.created");
+    public Binding eventCreatedBinding() {
+        return BindingBuilder.bind(eventCreatedQueue()).to(eventExchange()).with("event.created");
     }
 
     @Bean
-    public Binding eventRsvpBinding(Queue eventRsvpQueue, TopicExchange eventExchange) {
-        return BindingBuilder.bind(eventRsvpQueue).to(eventExchange).with("event.rsvp");
+    public Binding eventRsvpBinding() {
+        return BindingBuilder.bind(eventRsvpQueue()).to(eventExchange()).with("event.rsvp");
     }
 
     @Bean

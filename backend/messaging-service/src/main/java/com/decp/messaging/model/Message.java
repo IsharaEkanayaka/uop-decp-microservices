@@ -34,5 +34,6 @@ public class Message {
     @Builder.Default
     private List<Long> readBy = new ArrayList<>();
 
+    @Indexed
     private LocalDateTime createdAt;
 }

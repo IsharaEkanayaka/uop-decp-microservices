@@ -20,5 +20,6 @@ public class ConversationResponse {
     private String lastMessage;
     private LocalDateTime lastMessageAt;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private long unreadCount;
 }
