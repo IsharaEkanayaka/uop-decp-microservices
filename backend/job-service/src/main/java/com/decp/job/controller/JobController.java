@@ -53,7 +53,6 @@ public class JobController {
             return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage()));
         }
     }
-    }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateJob(
@@ -90,8 +89,6 @@ public class JobController {
             return ResponseEntity.status(403).body(new ErrorResponse(e.getMessage()));
         }
     }
-        }
-    }
 
     @GetMapping("/{id}/applications")
     public ResponseEntity<?> getApplicationsByJob(
@@ -112,16 +109,17 @@ public class JobController {
     public ResponseEntity<List<Application>> getApplicationsByUser(@PathVariable Long userId) {
         return ResponseEntity.ok(jobService.getApplicationsByUserId(userId));
     }
-}
 
-class ErrorResponse {
-    private String message;
-    
-    public ErrorResponse(String message) {
-        this.message = message;
-    }
-    
-    public String getMessage() {
-        return message;
+    // Error Response DTO
+    static class ErrorResponse {
+        private String message;
+        
+        public ErrorResponse(String message) {
+            this.message = message;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
     }
 }
