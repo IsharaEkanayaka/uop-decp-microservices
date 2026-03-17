@@ -93,8 +93,10 @@ export default function JobsPage() {
       setShowEditForm(false);
       setSelectedJob(null);
       loadJobs();
-    } catch {
-      setError("Failed to update job");
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.message || "Failed to update job";
+      setError(errorMsg);
+      console.error("Job update error:", err);
     }
     setCreating(false);
   };
@@ -104,8 +106,10 @@ export default function JobsPage() {
       const updated = await jobService.toggleStatus(jobId, action);
       setJobs(jobs.map((j) => (j.id === jobId ? updated.data : j)));
       setSelectedJob(updated.data);
-    } catch {
-      setError("Failed to update job status");
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.message || "Failed to update job status";
+      setError(errorMsg);
+      console.error("Job status update error:", err);
     }
   };
 
