@@ -174,7 +174,12 @@ jobs:
             --cluster decp-cluster \
             --services api-gateway auth-service user-service post-service \
               job-service event-service research-service messaging-service \
-              notification-service analytics-service mentorship-service \
+              notification-service analytics-service \
+            --query 'services[*].{Service:serviceName,Running:runningCount,Desired:desiredCount}' \
+            --output table
+          aws ecs describe-services \
+            --cluster decp-cluster \
+            --services mentorship-service \
             --query 'services[*].{Service:serviceName,Running:runningCount,Desired:desiredCount}' \
             --output table
 
