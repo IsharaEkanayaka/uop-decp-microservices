@@ -66,6 +66,8 @@ export interface Job {
   type: string;
   postedBy: string;
   posterName: string;
+  status?: "OPEN" | "CLOSED";
+  applicationCount?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -75,7 +77,7 @@ export interface JobApplication {
   jobId: number;
   userId: string;
   applicantName: string;
-  coverLetter: string;
+  whyInterested: string;
   resumeUrl?: string;
   status: "PENDING" | "REVIEWED" | "ACCEPTED" | "REJECTED";
   appliedAt: string;
@@ -145,6 +147,22 @@ export type ResearchCategory =
   | "CONFERENCE"
   | "WORKSHOP";
 
+export type ProjectRole = "OWNER" | "COLLABORATOR" | "VIEWER";
+
+export interface ProjectMemberDTO {
+  id: number;
+  userId: number;
+  userName: string;
+  role: ProjectRole;
+  joinedAt: string;
+}
+
+export interface AddProjectMemberRequest {
+  userId: number;
+  userName: string;
+  role: ProjectRole;
+}
+
 export interface ResearchResponse {
   id: number;
   title: string;
@@ -159,6 +177,7 @@ export interface ResearchResponse {
   citations: number;
   createdBy: string;
   createdByName: string;
+  members: ProjectMemberDTO[];
   createdAt: string;
   updatedAt: string;
 }
@@ -303,7 +322,7 @@ export interface TimelineEntry {
 
 // ==================== Mentorship ====================
 export type MentorshipRole = "MENTOR" | "MENTEE";
-export type Availability = "FULL_TIME" | "PART_TIME" | "WEEKENDS_ONLY";
+export type Availability = "HIGHLY_AVAILABLE" | "AVAILABLE" | "LIMITED" | "NOT_AVAILABLE";
 export type ProposedDuration =
   | "ONE_MONTH"
   | "THREE_MONTHS"

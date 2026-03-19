@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MessageRepository extends MongoRepository<Message, String> {
 
-    Page<Message> findByConversationIdOrderByCreatedAtDesc(String conversationId, Pageable pageable);
+    Page<Message> findByConversationIdOrderByCreatedAtAsc(String conversationId, Pageable pageable);
 
     long countByConversationIdAndReadByNotContaining(String conversationId, Long userId);
 

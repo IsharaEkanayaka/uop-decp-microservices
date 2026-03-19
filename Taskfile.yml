@@ -2,7 +2,7 @@
 version: "3"
 
 vars:
-  JAVA_HOME: C:\Program Files\Java\jdk-17
+  JAVA_HOME: C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot
   MVN: mvnw.cmd
   BACKEND_DIR: backend
   FRONTEND_DIR: frontend/web-client
@@ -31,9 +31,26 @@ tasks:
       - task: run:all
 
   stop:
-    desc: Stop all running services and infrastructure
+    desc: Stop all Java microservices and Docker infrastructure
     cmds:
+      - task: stop:services
       - task: stop:infra
+
+  # ──────────────────────────────────────────
+  # Infrastructure
+  # ──────────────────────────────────────────
+
+  # ──────────────────────────────────────────
+  # Stop Services
+  # ──────────────────────────────────────────
+
+  stop:services:
+    desc: Stop all running Java microservices
+    cmds:
+      - cmd: powershell -Command "Get-Process java -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue ; Write-Host 'All Java processes stopped'"
+        platforms: [windows]
+      - cmd: pkill -f 'java.*jar' || true
+        platforms: [linux, darwin]
 
   # ──────────────────────────────────────────
   # Infrastructure

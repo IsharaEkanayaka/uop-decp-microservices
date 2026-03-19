@@ -58,7 +58,7 @@ public class MessagingService {
                     .senderId(currentUserId)
                     .senderName(currentUserName)
                     .content(request.getInitialMessage())
-                    .readBy(List.of(currentUserId))
+                    .readBy(new java.util.ArrayList<>(java.util.List.of(currentUserId)))
                     .createdAt(now)
                     .build();
             messageRepository.save(message);
@@ -76,19 +76,26 @@ public class MessagingService {
     }
 
     public ConversationResponse getConversation(String conversationId, Long userId) {
+        System.out.println("Getting conversation with ID: " + conversationId + " for user: " + userId);
         Conversation conversation = findConversationAndVerifyAccess(conversationId, userId);
+        System.out.println("Found conversation: " + conversation.getId());
         return toConversationResponse(conversation, userId);
     }
 
     public Page<MessageResponse> getMessages(String conversationId, Long userId, int page, int size) {
+        System.out.println("MessagingService.getMessages called with conversationId: " + conversationId + ", userId: " + userId);
         findConversationAndVerifyAccess(conversationId, userId);
 
         Pageable pageable = PageRequest.of(page, size);
-        return messageRepository.findByConversationIdOrderByCreatedAtDesc(conversationId, pageable)
-                .map(this::toMessageResponse);
+        Page<Message> messagesPage = messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId, pageable);
+        System.out.println("Query returned " + messagesPage.getTotalElements() + " total messages");
+        System.out.println("Current page has " + messagesPage.getContent().size() + " messages");
+        
+        return messagesPage.map(this::toMessageResponse);
     }
 
     public MessageResponse sendMessage(String conversationId, Long senderId, String senderName, String content) {
+        System.out.println("Saving message to conversation: " + conversationId + " from user: " + senderId);
         Conversation conversation = findConversationAndVerifyAccess(conversationId, senderId);
 
         LocalDateTime now = LocalDateTime.now();
@@ -97,11 +104,12 @@ public class MessagingService {
                 .senderId(senderId)
                 .senderName(senderName)
                 .content(content)
-                .readBy(List.of(senderId))
+                .readBy(new java.util.ArrayList<>(java.util.List.of(senderId)))
                 .createdAt(now)
                 .build();
 
         Message saved = messageRepository.save(message);
+        System.out.println("Message saved with ID: " + saved.getId() + " to conversation: " + saved.getConversationId());
 
         // Update conversation with last message
         conversation.setLastMessage(content);
@@ -116,18 +124,31 @@ public class MessagingService {
         findConversationAndVerifyAccess(conversationId, userId);
 
         Pageable allMessages = PageRequest.of(0, 1000);
-        Page<Message> messages = messageRepository.findByConversationIdOrderByCreatedAtDesc(conversationId, allMessages);
+        Page<Message> messages = messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId, allMessages);
 
         messages.getContent().stream()
-                .filter(m -> !m.getReadBy().contains(userId))
+                .filter(m -> {
+                    List<Long> readBy = m.getReadBy();
+                    return readBy != null && !readBy.contains(userId);
+                })
                 .forEach(m -> {
-                    m.getReadBy().add(userId);
+                    List<Long> readBy = m.getReadBy();
+                    if (readBy == null) {
+                        readBy = new java.util.ArrayList<>();
+                    } else if (readBy.getClass().getName().contains("Immutable") || readBy.getClass().getName().contains("java.util.List$Of")) {
+                        readBy = new java.util.ArrayList<>(readBy);
+                    }
+                    readBy.add(userId);
+                    m.setReadBy(readBy);
                     messageRepository.save(m);
                 });
     }
 
     public void deleteConversation(String conversationId, Long userId) {
         Conversation conversation = findConversationAndVerifyAccess(conversationId, userId);
+        if (conversation.getDeletedBy() == null) {
+            conversation.setDeletedBy(new java.util.ArrayList<>());
+        }
         conversation.getDeletedBy().add(userId);
 
         // If all participants deleted, remove entirely
@@ -143,7 +164,7 @@ public class MessagingService {
         Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new RuntimeException("Conversation not found with id: " + conversationId));
 
-        if (!conversation.getParticipants().contains(userId)) {
+        if (conversation.getParticipants() == null || !conversation.getParticipants().contains(userId)) {
             throw new RuntimeException("Not authorized to access this conversation");
         }
 
@@ -154,11 +175,12 @@ public class MessagingService {
         long unreadCount = messageRepository.countByConversationIdAndReadByNotContaining(conversation.getId(), userId);
         return ConversationResponse.builder()
                 .id(conversation.getId())
-                .participants(conversation.getParticipants())
-                .participantNames(conversation.getParticipantNames())
+                .participants(conversation.getParticipants() != null ? conversation.getParticipants() : java.util.Collections.emptyList())
+                .participantNames(conversation.getParticipantNames() != null ? conversation.getParticipantNames() : java.util.Collections.emptyList())
                 .lastMessage(conversation.getLastMessage())
                 .lastMessageAt(conversation.getLastMessageAt())
                 .createdAt(conversation.getCreatedAt())
+                .updatedAt(conversation.getUpdatedAt())
                 .unreadCount(unreadCount)
                 .build();
     }

@@ -1,8 +1,9 @@
 import axios from "axios";
-import { getToken, clearAuth } from "../utils/localStorage";
+import { getToken, clearAuth, getStoredUser } from "../utils/localStorage";
 
+console.log("API base URL:", import.meta.env.VITE_API_BASE_URL);
 const api = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: import.meta.env.VITE_API_BASE_URL?.trim() || "http://localhost:8080",
   timeout: 15000,
 });
 
@@ -10,6 +11,25 @@ api.interceptors.request.use((config) => {
   const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  // Add user headers from stored user
+  const storedUser = getStoredUser();
+  if (storedUser) {
+    try {
+      const user = JSON.parse(storedUser);
+      if (user.id !== undefined && user.id !== null) {
+        config.headers["X-User-Id"] = String(user.id);
+      }
+      if (user.role) {
+        config.headers["X-User-Role"] = user.role;
+      }
+      if (user.fullName) {
+        config.headers["X-User-Name"] = user.fullName;
+      }
+    } catch (e) {
+      console.error("Failed to parse stored user:", e);
+    }
   }
   return config;
 });
